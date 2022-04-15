@@ -1,0 +1,49 @@
+scalar Date
+scalar DateTime
+
+type Query {
+  getAllPAFTypes: [PAF_TYPE]
+  getALLPAFs: [PAF]
+}
+
+type Mutation {
+  createPAF(data: PAFCreateInput!): PAF!
+}
+
+type PAF {
+  id_PAF: ID!
+  PAFType: PAF_TYPE!
+  status: Int
+  date_effective: Date
+  id_registry: Int
+  id_employee: Int
+  id_creator: Int
+  id_creator_pers: Int
+  id_editor: Int
+  id_editor_pers: Int
+  date_created: Date
+  date_modified: Date
+  date_authorized: Date
+  dt_created: DateTime
+  dt_modified: DateTime
+}
+
+type PAF_TYPE {
+  id: ID!
+  PAFType: String!
+  PAFType_slug: String!
+  is_active: Boolean!
+  is_visible: Boolean!
+  order: Int!
+}
+
+input PAFCreateInput {
+  id_PAF: ID!
+  PAFType: Int!
+  status: Int
+  date_effective: Date
+  id_registry: Int
+  id_employee: Int
+  id_creator: Int
+  id_creator_pers: Int
+}
