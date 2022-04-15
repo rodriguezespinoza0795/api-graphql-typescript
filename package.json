@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "rm ./dist/* -r && tsc --build && cp ./src/schema.graphql ./dist/src",
+    "build": "tsc --build && cp ./src/schema.graphql ./dist/src",
     "start": "node ./dist/src",
     "dev": " npx ts-node src/index.ts"
   },
