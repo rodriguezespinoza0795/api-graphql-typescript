@@ -4,11 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npm clean && tsc --build && npm copyfiles",
+    "build": "rm ./dist/* -r && tsc --build && cp ./src/schema.graphql ./dist/src",
     "start": "node ./dist/src",
-    "dev": " npx ts-node src/index.ts",
-    "clean": "rimraf ./dist/src",
-    "copyfiles": "copyfiles src/schema.graphql ./dist/src"
+    "dev": " npx ts-node src/index.ts"
   },
   "keywords": [],
   "author": "",
