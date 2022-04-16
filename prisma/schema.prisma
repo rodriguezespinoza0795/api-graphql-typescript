@@ -1,0 +1,40 @@
+// This is your Prisma schema file,
+// learn more about it in the docs https//pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model PAF {
+  id_PAF          Int       @id @default(autoincrement())
+  PAFType         Int
+  status          Int
+  date_effective  DateTime
+  id_registry     Int
+  id_employee     Int
+  id_creator      Int
+  id_creator_pers Int
+  id_editor       Int?
+  id_editor_pers  Int?
+  date_created    DateTime  @default(now())
+  date_modified   DateTime? @updatedAt
+  date_authorized DateTime?
+  dt_created      DateTime  @default(now())
+  dt_modified     DateTime? @updatedAt
+  PAF_types       PAF_types @relation(fields: [PAFType], references: [id_PAFType])
+}
+
+model PAF_types {
+  id_PAFType   Int     @id @default(autoincrement())
+  PAFType      String
+  PAFType_slug String
+  is_active    Boolean
+  is_visible   Boolean
+  order        Int
+  PAF          PAF[]
+}

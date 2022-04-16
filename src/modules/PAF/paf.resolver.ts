@@ -1,86 +1,23 @@
-import { PAF, PAF_TYPE, CreatePAFDto } from './paf.model'
+import type { PAF_types, PAF, PrismaClient } from '@prisma/client'
 
-const PAFs: PAF[] = [
-  {
-    id_PAF: 1,
-    PAFType: {
-        id: 1,
-        PAFType: 'Promotion',
-        PAFType_slug: 'Promotion',
-        is_active: true,
-        is_visible: true,
-        order: 1
-    },
-    status: 1,
-    date_effective: new Date(),
-    id_registry: 108294,
-    id_employee: 108294,
-    id_creator: 108294,
-    id_creator_pers: 108294,
-    id_editor: 108294,
-    id_editor_pers: 108294,
-    date_created: new Date(),
-    date_modified: new Date(),
-    date_authorized: new Date(),
-    dt_created: new Date(),
-    dt_modified: new Date(),
-  },
-]
+type ResolverContext = { prisma: PrismaClient}
 
-const PAFTypes: PAF_TYPE[] = [
-    {
-        id: 1,
-        PAFType: 'Promotion',
-        PAFType_slug: 'Promotion',
-        is_active: true,
-        is_visible: true,
-        order: 1
-    },
-    {
-        id: 2,
-        PAFType: 'Supervisor',
-        PAFType_slug: 'Supervisor',
-        is_active: true,
-        is_visible: true,
-        order: 2
-    },
-  ]
-
-export function getALLPAFs(): PAF[] {
-    return PAFs
+export function getALLPAFs(parent:unknown, arg:unknown, context: ResolverContext): Promise<PAF[]> {
+    return context.prisma.pAF.findMany()
 }
 
-export function getAllPAFTypes(): PAF_TYPE[] {
-    return PAFTypes
+type createPAFInput = Pick<PAF, 'PAFType' | 'status' | 'date_effective' | 'id_registry' | 'id_employee' | 'id_creator' | 'id_creator_pers'>
+
+export function getAllPAFTypes(parent:unknown, arg:unknown, context: ResolverContext): Promise<PAF_types[]> {
+    return context.prisma.pAF_types.findMany()
 }
 
-export function createPAF(data:CreatePAFDto): PAF {
-    const currentLength = PAFs.length
-    const newPAF: PAF =   {
-            id_PAF: currentLength+1,
-            PAFType: {
-                id: 1,
-                PAFType: 'Promotion',
-                PAFType_slug: 'Promotion',
-                is_active: true,
-                is_visible: true,
-                order: 1
-            },
-            status: 1,
-            date_effective: new Date(),
-            id_registry: 108294,
-            id_employee: 108294,
-            id_creator: 108294,
-            id_creator_pers: 108294,
-            id_editor: 108294,
-            id_editor_pers: 108294,
-            date_created: new Date(),
-            date_modified: new Date(),
-            date_authorized: new Date(),
-            dt_created: new Date(),
-            dt_modified: new Date(),
+export function createPAF(parent:unknown, {data}:{ data:createPAFInput}, context: ResolverContext): Promise<PAF> {
+    return context.prisma.pAF.create(
+    {data :
+        {
+            ...data,
+            date_effective: new Date(data.date_effective),
         }
-
-  PAFs.push(newPAF)
-  return newPAF
+    })
 }
