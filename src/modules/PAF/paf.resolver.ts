@@ -1,9 +1,12 @@
 import type { PAF_types, PAF, PrismaClient } from '@prisma/client'
 
+type ResolverParent = unknown
 type ResolverContext = { prisma: PrismaClient}
 
-export function getALLPAFs(parent:unknown, arg:unknown, context: ResolverContext): Promise<PAF[]> {
-    return context.prisma.pAF.findMany()
+export function getALLPAFs(parent:ResolverParent, arg:unknown, context: ResolverContext): Promise<PAF[]> {
+    return context.prisma.pAF.findMany({
+        include: { Type: true }
+    })
 }
 
 type createPAFInput = Pick<PAF, 'PAFType' | 'status' | 'date_effective' | 'id_registry' | 'id_employee' | 'id_creator' | 'id_creator_pers'>

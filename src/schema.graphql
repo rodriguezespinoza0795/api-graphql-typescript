@@ -3,25 +3,16 @@ scalar DateTime
 
 type Query {
   getAllPAFTypes: [PAF_types]
-  getALLPAFs: [PAF]
+  getALLPAFs: [PAF]!
 }
 
 type Mutation {
   createPAF(data: createPAFInput): PAF
 }
 
-type PAF_types {
-  id_PAFType: Int
-  PAFType: String
-  PAFType_slug: String
-  is_active: Boolean
-  is_visible: Boolean
-  order: Int
-}
-
 type PAF {
   id_PAF: ID!
-  PAFType: PAF_types!
+  Type: PAF_types!
   status: Int
   date_effective: Date
   id_registry: Int
@@ -35,6 +26,16 @@ type PAF {
   date_authorized: Date
   dt_created: DateTime
   dt_modified: DateTime
+}
+
+type PAF_types {
+  id_PAFType: ID
+  PAFType: String
+  PAFType_slug: String
+  is_active: Boolean
+  is_visible: Boolean
+  order: Int
+  paf: [PAF]
 }
 
 input createPAFInput {

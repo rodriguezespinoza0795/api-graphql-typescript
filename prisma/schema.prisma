@@ -26,7 +26,7 @@ model PAF {
   date_authorized DateTime?
   dt_created      DateTime  @default(now())
   dt_modified     DateTime? @updatedAt
-  PAF_types       PAF_types @relation(fields: [PAFType], references: [id_PAFType])
+  Type            PAF_types @relation(fields: [PAFType], references: [id_PAFType])
 }
 
 model PAF_types {
