@@ -4,7 +4,11 @@ scalar DateTime
 type Query {
   getAllPAFTypes: [PAF_types]
   getAllPAFs: [PAF]
-  getAllEmployees: [E_employee]
+  getAllEmployees(
+    skip: Int
+    take: Int
+    where: e_employeeWhereInput
+  ): [E_employee]
   getEmployee(id: ID!): E_employee
 }
 
@@ -118,4 +122,23 @@ input createPAFInput {
   id_employee: Int
   id_creator: Int
   id_creator_pers: Int
+}
+
+input e_employeeWhereInput {
+  shortName: StringFilterInput
+  id_supervisor: Int
+}
+
+input StringFilterInput {
+  equals: String
+  in: [String]
+  notIn: [String]
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  not: String
 }
