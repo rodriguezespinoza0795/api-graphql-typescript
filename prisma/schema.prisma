@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs https//pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -12,29 +9,293 @@ datasource db {
 
 model PAF {
   id_PAF          Int       @id @default(autoincrement())
-  PAFType         Int
-  status          Int
-  date_effective  DateTime
-  id_registry     Int
-  id_employee     Int
-  id_creator      Int
-  id_creator_pers Int
-  id_editor       Int?
-  id_editor_pers  Int?
-  date_created    DateTime  @default(now())
-  date_modified   DateTime? @updatedAt
-  date_authorized DateTime?
-  dt_created      DateTime  @default(now())
-  dt_modified     DateTime? @updatedAt
-  Type            PAF_types @relation(fields: [PAFType], references: [id_PAFType])
+  id_PAFType      Int       @default(0)
+  status          Int       @default(1)
+  date_effective  DateTime  @default(dbgenerated("'0000-00-00'")) @db.Date
+  id_registry     Int       @default(0)
+  id_employee     Int       @default(0)
+  id_creator      Int       @default(0)
+  id_creator_pers Int       @default(0)
+  id_editor       Int       @default(0)
+  id_editor_pers  Int       @default(0)
+  date_created    DateTime? @default(now()) @db.DateTime(0)
+  date_modified   DateTime? @default(now()) @db.DateTime(0)
+  date_authorized DateTime? @db.Date
+  dt_created      DateTime  @default(now()) @db.DateTime(0)
+  dt_modified     DateTime  @default(now()) @db.DateTime(0)
+  PAFType         PAF_types @relation(fields: [id_PAFType], references: [id_PAFType])
+
+  @@index([date_created], map: "date_created")
+  @@index([date_effective], map: "date_effective")
+  @@index([id_employee], map: "emp")
+  @@index([id_PAF], map: "id_paf")
+  @@index([id_PAFType], map: "type")
+  @@index([id_PAFType, status], map: "type_stat")
 }
 
 model PAF_types {
-  id_PAFType   Int     @id @default(autoincrement())
-  PAFType      String
-  PAFType_slug String
-  is_active    Boolean
-  is_visible   Boolean
-  order        Int
+  id_PAFType   Int    @id @default(autoincrement())
+  PAFType      String @db.VarChar(45)
+  PAFType_slug String @unique(map: "PAFType_slug_UNIQUE") @db.VarChar(45)
+  is_active    Int    @default(1) @db.TinyInt
+  is_visible   Int    @default(1) @db.TinyInt
+  order        Int?
   PAF          PAF[]
+}
+
+model ESC {
+  id_ESC         Int      @id @default(autoincrement())
+  id_PAF         Int      @default(0)
+  id_ESCType     Int      @default(0)
+  status         Int      @default(1)
+  date_effective DateTime @default(dbgenerated("'0000-00-00'")) @db.Date
+  date_from      DateTime @default(dbgenerated("'0000-00-00'")) @db.Date
+  date_to        DateTime @default(dbgenerated("'3011-12-31'")) @db.Date
+  value          String   @default("0") @db.VarChar(45)
+  id_registry    Int      @default(0)
+  id_prevESC     Int      @default(0)
+  id_nextESC     Int      @default(0)
+
+  @@index([date_from, id_registry], map: "comb")
+  @@index([id_registry, id_ESCType, status, date_effective], map: "comb2")
+  @@index([id_PAF], map: "paf")
+  @@index([id_ESCType], map: "type")
+}
+
+model ESC_status {
+  id_status   Int    @id @default(autoincrement())
+  name_status String @default("Draft") @db.VarChar(45)
+}
+
+model ESC_types {
+  id_ESCType Int    @id @default(autoincrement())
+  ESCType    String @db.VarChar(45)
+}
+
+model PAF_ESC {
+  id_PAF_ESC Int @id @default(autoincrement())
+  id_PAFType Int
+  id_ESCType Int
+}
+
+model PAF_authorization {
+  id_PAFAuthorization Int       @id @default(autoincrement())
+  id_PAF              Int       @default(0)
+  status              Int
+  id_authorizer       Int       @default(0)
+  pos_authorizer      Int       @default(0)
+  date_authorized     DateTime  @db.Date
+  response_authorizer String?   @db.VarChar(45)
+  comments_authorizer String?   @db.Text
+  id_creator          Int       @default(0)
+  id_creator_pers     Int       @default(0)
+  id_editor           Int       @default(0)
+  id_editor_pers      Int       @default(0)
+  date_created        DateTime  @db.Date
+  date_edited         DateTime  @db.Date
+  dt_edited           DateTime? @db.DateTime(0)
+
+  @@index([id_PAF, pos_authorizer], map: "comb")
+  @@index([id_PAF], map: "id_paf")
+}
+
+model PAF_frontend_perm {
+  id_type     Int
+  id_position Int
+  has_perm    Int @default(0)
+
+  @@id([id_type, id_position])
+}
+
+model PAF_positions {
+  id_PAF_Auth              Int  @id @default(autoincrement())
+  id_PAFType               Int
+  id_positionAuthorization Int
+  type_authorization       Int?
+  for_id_position          Int?
+  for_id_department        Int?
+  for_id_area              Int?
+  for_id_group             Int?
+  for_is_trainee           Int?
+  for_id_lob               Int?
+  for_id_generation        Int?
+  not_for_id_position      Int?
+  not_for_id_department    Int?
+  not_for_id_area          Int?
+  not_for_id_group         Int?
+  not_for_is_trainee       Int?
+  not_for_id_lob           Int?
+  not_for_id_generation    Int?
+}
+
+model PAF_terminations {
+  id_termination Int       @id @default(autoincrement())
+  id_PAF         Int
+  id_registry    Int
+  id_employee    Int
+  fullName       String    @db.VarChar(255)
+  id_position    Int
+  position       String    @db.VarChar(45)
+  id_type        Int
+  id_performance Int
+  id_rehire      Int
+  id_reason      Int
+  reason         String    @db.VarChar(255)
+  comments       String    @db.Text
+  date_effective DateTime? @db.Date
+  id_subreason   Int?
+  details        String?   @db.Text
+  id_reason_2    Int?
+  id_subreason_2 Int?
+  comments_2     String?   @db.Text
+}
+
+model PAF_terminations_history {
+  id_terminations_history Int       @id @default(autoincrement())
+  id_PAF                  Int
+  id_type                 Int
+  id_rehire               Int
+  id_reason               Int
+  comments                String?   @db.Text
+  id_subreason            Int?
+  modifiedBy              Int?
+  date_modified           DateTime? @db.DateTime(0)
+}
+
+model e_employee {
+  id_employee                Int       @id @default(autoincrement())
+  id_registry                Int       @default(0)
+  id_position                Int       @default(0)
+  id_organizationGroupRegion Int       @default(1)
+  firstName                  String    @db.VarChar(45)
+  middleName                 String?   @db.VarChar(45)
+  lastName                   String    @db.VarChar(45)
+  secondLastName             String?   @db.VarChar(45)
+  shortName                  String    @db.VarChar(255)
+  fullName                   String    @db.VarChar(255)
+  nickname                   String?   @db.VarChar(32)
+  RFC                        String?   @db.VarChar(45)
+  CURP                       String?   @db.VarChar(45)
+  IMSS                       String?   @db.VarChar(45)
+  civilStatus                String?   @db.VarChar(45)
+  nationality                String?   @db.VarChar(45)
+  phone                      String?   @db.VarChar(20)
+  birthday                   DateTime? @db.Date
+  id_gender                  Int       @default(0)
+  bloodtype                  String?   @default("0") @db.VarChar(5)
+  is_rehired                 Boolean   @default(false)
+  date_rehired               DateTime? @db.Date
+  is_referred                Boolean   @default(false)
+  date_referred              DateTime? @db.Date
+  id_referredBy              Int?
+  is_rep                     Boolean   @default(false)
+  is_trainee                 Boolean   @default(false)
+  is_newbie                  Boolean   @default(false)
+  is_manager                 Boolean   @default(false)
+  is_readyToTransfer         Boolean   @default(false)
+  is_propensityToLeave       Boolean   @default(false)
+  date_hire                  DateTime  @default(dbgenerated("'0000-00-00'")) @db.Date
+  date_lwd                   DateTime? @db.Date
+  id_site                    Int       @default(1)
+  weeklyHours                Int       @default(0)
+  id_paytype                 Int       @default(0)
+  id_outsource               Int?      @default(0)
+  id_firstGeneration         Int?      @default(0)
+  id_currentGeneration       Int?      @default(0)
+  id_lob                     Int?      @default(0)
+  id_department              Int?      @default(0)
+  id_area                    Int?      @default(0)
+  id_group                   Int?      @default(0)
+  id_supervisor              Int?      @default(0)
+  id_qa_supervisor           Int?      @default(0)
+  id_ods                     Int?      @default(0)
+  id_coach_support           Int?      @default(0)
+  id_creator                 Int       @default(0)
+  id_creator_pers            Int       @default(0)
+  id_editor                  Int       @default(0)
+  id_editor_pers             Int       @default(0)
+  date_created               DateTime  @default(dbgenerated("'0000-00-00'")) @db.Date
+  date_modified              DateTime  @default(dbgenerated("'0000-00-00'")) @db.Date
+  is_active                  Boolean   @default(true)
+  path_image                 String    @default("http://www.beliveo.net/beliveo/bbox/wp-content/uploads/2012/10/no_available.png") @db.VarChar(255)
+  mail                       String?   @db.VarChar(255)
+  cellphone                  String?   @db.VarChar(20)
+  zip_code                   String?   @db.VarChar(45)
+  address                    String?   @db.VarChar(255)
+  state                      String?   @db.VarChar(45)
+  country                    String?   @db.VarChar(45)
+  city                       String?   @db.VarChar(45)
+  id_organization            Int?      @default(1)
+  id_organizationGroup       Int?      @default(1)
+  id_hierarchy               Int?      @default(1)
+  id_unit                    Int?
+  id_unit_paf                Int?
+
+  @@unique([id_organizationGroupRegion, id_employee], map: "employee_organization")
+  @@index([id_employee, id_position, id_registry, is_trainee, id_outsource, id_lob, id_department, id_area, id_group, id_supervisor, id_qa_supervisor, id_ods, id_coach_support, is_active, date_hire, weeklyHours], map: "Secondary")
+  @@index([id_currentGeneration], map: "curr_gen")
+  @@index([id_employee], map: "emp")
+  @@index([id_firstGeneration], map: "first_gen")
+  @@index([id_registry], map: "registry")
+  @@index([id_employee, shortName, is_active], map: "shortName")
+  @@index([shortName], map: "shortname_dx")
+  @@index([id_supervisor], map: "supervisor")
+}
+
+model history {
+  date_history               DateTime @default(dbgenerated("'0000-00-00'")) @db.Date
+  id_employee                Int?     @default(0)
+  id_registry                Int      @default(0)
+  id_organization            Int?     @default(0)
+  id_organizationGroup       Int?     @default(0)
+  id_organizationGroupRegion Int?     @default(0)
+  is_rep                     Boolean? @default(false)
+  is_trainee                 Boolean? @default(false)
+  is_newbie                  Boolean? @default(false)
+  is_manager                 Boolean? @default(false)
+  is_readyToTransfer         Boolean? @default(false)
+  is_propensityToLeave       Boolean? @default(false)
+  id_site                    Int?     @default(0)
+  weeklyHours                Int?     @default(0)
+  id_paytype                 Int?     @default(0)
+  id_outsource               Int?     @default(0)
+  id_currentGeneration       Int?     @default(0)
+  id_lob                     Int?     @default(0)
+  id_department              Int?     @default(0)
+  id_area                    Int?     @default(0)
+  id_group                   Int?     @default(0)
+  id_supervisor              Int?     @default(0)
+  id_position                Int?     @default(0)
+  id_ods                     Int?     @default(0)
+  id_qa_supervisor           Int?     @default(0)
+  id_coach_support           Int?     @default(0)
+  id_unit                    Int?
+  id_unit_paf                Int?
+
+  @@id([date_history, id_registry])
+  @@index([date_history], map: "date")
+  @@index([id_employee], map: "employee")
+  @@index([id_registry], map: "id_registry")
+  @@index([date_history, id_position, id_lob, id_employee], map: "idx_comp")
+  @@index([id_employee, date_history], map: "idx_date_employee")
+  @@index([is_trainee], map: "idx_trai")
+  @@index([id_lob], map: "lob")
+  @@index([id_position], map: "position")
+  @@index([id_qa_supervisor], map: "qa_coach")
+  @@index([id_supervisor], map: "supervisor")
+}
+
+model paf_to_cancel {
+  id_cancel           Int       @id @default(autoincrement())
+  id_PAF              Int       @default(0)
+  is_cancelled        Int       @default(0) @db.TinyInt
+  reason              String    @db.Text
+  paf_status          Int?
+  paf_date_effective  DateTime? @db.Date
+  paf_type            Int?
+  term_paf            Int?
+  term_date_effective DateTime? @db.Date
+  term_type           Int?
+
+  @@index([id_PAF], map: "id_PAF")
 }

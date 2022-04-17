@@ -3,7 +3,9 @@ scalar DateTime
 
 type Query {
   getAllPAFTypes: [PAF_types]
-  getALLPAFs: [PAF]!
+  getAllPAFs: [PAF]
+  getAllEmployees: [E_employee]
+  getEmployee(id: ID!): E_employee
 }
 
 type Mutation {
@@ -12,7 +14,7 @@ type Mutation {
 
 type PAF {
   id_PAF: ID!
-  Type: PAF_types!
+  PAFType: PAF_types!
   status: Int
   date_effective: Date
   id_registry: Int
@@ -38,8 +40,78 @@ type PAF_types {
   paf: [PAF]
 }
 
+type E_employee {
+  id_employee: ID
+  id_registry: Int
+  id_position: Int
+  id_organizationGroupRegion: Int
+  firstName: String
+  middleName: String
+  lastName: String
+  secondLastName: String
+  shortName: String
+  fullName: String
+  nickname: String
+  RFC: String
+  CURP: String
+  IMSS: String
+  civilStatus: String
+  nationality: String
+  phone: String
+  birthday: Date
+  id_gender: Int
+  bloodtype: String
+  is_rehired: Boolean
+  date_rehired: Date
+  is_referred: Boolean
+  date_referred: Date
+  id_referredBy: Int
+  is_rep: Boolean
+  is_trainee: Boolean
+  is_newbie: Boolean
+  is_manager: Boolean
+  is_readyToTransfer: Boolean
+  is_propensityToLeave: Boolean
+  date_hire: Date
+  date_lwd: Date
+  id_site: Int
+  weeklyHours: Int
+  id_paytype: Int
+  id_outsource: Int
+  id_firstGeneration: Int
+  id_currentGeneration: Int
+  id_lob: Int
+  id_department: Int
+  id_area: Int
+  id_group: Int
+  id_supervisor: Int
+  id_qa_supervisor: Int
+  id_ods: Int
+  id_coach_support: Int
+  id_creator: Int
+  id_creator_pers: Int
+  id_editor: Int
+  id_editor_pers: Int
+  date_created: Date
+  date_modified: Date
+  is_active: Boolean
+  path_image: String
+  mail: String
+  cellphone: String
+  zip_code: String
+  address: String
+  state: String
+  country: String
+  city: String
+  id_organization: Int
+  id_organizationGroup: Int
+  id_hierarchy: Int
+  id_unit: Int
+  id_unit_paf: Int
+}
+
 input createPAFInput {
-  PAFType: Int!
+  id_PAFType: Int!
   status: Int
   date_effective: String
   id_registry: Int
