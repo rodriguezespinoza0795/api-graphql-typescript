@@ -1,8 +1,8 @@
 import type { PAF, PrismaClient } from '@prisma/client'
 import { AuthenticationError } from 'apollo-server-express'
 
-type ResolverParent = unknown
-type ResolverContext = { prisma: PrismaClient, user: Express.User | undefined }
+export type ResolverParent = unknown
+export type ResolverContext = { prisma: PrismaClient, user: Express.User | undefined }
 
 export function findAll(parent:ResolverParent, arg:unknown, context: ResolverContext): Promise<PAF[]> {
     return context.prisma.pAF.findMany({
