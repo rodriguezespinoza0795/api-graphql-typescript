@@ -1,49 +1,42 @@
-const { ApolloServer, gql } = require('apollo-server');
+import { ApolloServer } from 'apollo-server-express'
+import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core'
+import express from 'express'
+import http from 'http'
 import path from 'path'
 import { readFileSync } from 'fs'
 import resolvers from './resolvers'
 import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient({
-  log: [
-    {
-      emit: 'event',
-      level: 'query',
-    },
-    {
-      emit: 'stdout',
-      level: 'error',
-    },
-    {
-      emit: 'stdout',
-      level: 'info',
-    },
-    {
-      emit: 'stdout',
-      level: 'warn',
-    },
-  ],
-})
+const prisma = new PrismaClient()
 
-prisma.$on('query', (e) => {
-  console.log('Query: ' + e.query)
-  console.log('Params: ' + e.params)
-  console.log('Duration: ' + e.duration + 'ms')
-})
 const typeDefs = readFileSync(path.join(__dirname, 'schema.graphql'), 'utf8')
 
-const server = new ApolloServer({ 
-  typeDefs, 
-  resolvers, 
-  context: {
-    prisma
-  }
-});
+!(async function () {
+  // Required logic for integrating with Express
+  const app = express()
+  const httpServer = http.createServer(app)
+  // Middlewares
+  app.use('/static', express.static(path.join(__dirname, '../public')))
 
-// The `listen` method launches a web server.
-server.listen({ port: process.env.PORT || 4000 }).then(({ url }: { url: string }) => {
-    console.log(`
-      🚀  Server is ready at ${url}
-      📭  Query at https://studio.apollographql.com/dev
-    `);
-  });
+  // Same ApolloServer initialization as before, plus the drain plugin.
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+    context: {
+      prisma,
+    },
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  })
+
+  // More required logic for integrating with Express
+  await server.start()
+  server.applyMiddleware({
+    app,
+    path: '/graphql',
+  })
+
+  await new Promise<void>((resolve) =>
+    httpServer.listen({ port: process.env.PORT || 4000 }, resolve)
+  )
+  console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
+})()
