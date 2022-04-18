@@ -1,1 +1,1 @@
-web: node ./dist/src
+web: node ./dist

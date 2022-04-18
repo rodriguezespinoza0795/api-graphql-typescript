@@ -4,9 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "tsc --build && cp ./src/schema.graphql ./dist/src",
-    "start": "node ./dist/src",
-    "dev": " npx ts-node src/index.ts --watch"
+    "build": "npx prisma generate && tsc --build && cp ./src/schema.graphql ./dist/src",
+    "start": "node ./dist",
+    "dev": " npx ts-node ./index.ts --watch",
+    "test": "jest ./src"
   },
   "keywords": [],
   "author": "",
